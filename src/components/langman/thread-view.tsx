@@ -73,19 +73,26 @@ export function ThreadView({
         </ConversationContent>
       </Conversation>
       <div className="absolute bottom-0 z-20 flex w-full flex-col p-4">
-        <PromptInput className="bg-card" globalDrop onSubmit={handleSubmit}>
+        <PromptInput
+          className="bg-card/75 focus-within:bg-card/95backdrop-blur-sm transition-colors duration-500 [&>[data-slot='input-group']]:rounded-3xl [&>[data-slot='input-group']]:p-2"
+          globalDrop
+          onSubmit={handleSubmit}
+        >
           <PromptInputBody>
             <PromptInputTextarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
             />
           </PromptInputBody>
-          <PromptInputFooter>
-            <PromptInputSubmit
-              disabled={isLoading}
-              className="!h-8"
-              status={isLoading ? "streaming" : "ready"}
-            />
+          <PromptInputFooter className="flex">
+            <div className="min-w-0 flex-1"></div>
+            <div>
+              <PromptInputSubmit
+                disabled={isLoading}
+                className="!h-8"
+                status={isLoading ? "streaming" : "ready"}
+              />
+            </div>
           </PromptInputFooter>
         </PromptInput>
       </div>
