@@ -41,7 +41,7 @@ export function ThreadView({
   return (
     <div id="thread-view" className={cn("relative flex flex-col", className)}>
       <Conversation className="h-full">
-        <ConversationContent className="pb-[120px]">
+        <ConversationContent className="pb-[12rem]">
           {messages.map((message) => (
             <MessageView
               key={message.id}
@@ -63,10 +63,10 @@ export function ThreadView({
                         )
                         .join("\n")}
                 </Response>
-                <p>
-                  {message.type === "ai" &&
-                    message.tool_calls?.map((tool_call) => tool_call.name)}
-                </p>
+                {message.type === "ai" &&
+                  message.tool_calls?.map((tool_call) => (
+                    <p key={tool_call.id}>Calling tool: {tool_call.name}</p>
+                  ))}
               </MessageContent>
             </MessageView>
           ))}
