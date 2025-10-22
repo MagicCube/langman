@@ -74,12 +74,13 @@ export function ThreadView({
       </Conversation>
       <div className="absolute bottom-0 z-20 flex w-full flex-col p-4">
         <PromptInput
-          className="bg-card/75 focus-within:bg-card/95backdrop-blur-sm transition-colors duration-500 [&>[data-slot='input-group']]:rounded-3xl [&>[data-slot='input-group']]:p-2"
+          className="bg-card/75 focus-within:bg-card/95 rounded-3xl backdrop-blur-xs transition-colors duration-500 [&>[data-slot='input-group']]:rounded-3xl [&>[data-slot='input-group']]:p-2"
           globalDrop
           onSubmit={handleSubmit}
         >
           <PromptInputBody>
             <PromptInputTextarea
+              className="min-h-0 pb-0 transition-all duration-300 focus-within:min-h-16 focus-within:pb-3"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
             />
