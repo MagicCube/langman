@@ -26,17 +26,28 @@ export function ThreadView({
   messages,
   isLoading,
   onSubmit,
+  onAbort,
 }: {
   className?: string;
   messages: Message[];
   isLoading?: boolean;
   onSubmit?: (message: PromptInputMessage) => void;
+  onAbort?: () => void;
 }) {
   const [inputText, setInputText] = useState<string>("");
   const handleSubmit = (message: PromptInputMessage) => {
+    if (
+      (!message.text || message.text.trim() === "") &&
+      (!message.files || message.files?.length === 0)
+    )
+      return;
     if (isLoading) return;
     setInputText("");
     onSubmit?.(message);
+  };
+  const handleAbort = () => {
+    if (!isLoading) return;
+    onAbort?.();
   };
   return (
     <div id="thread-view" className={cn("relative flex flex-col", className)}>
@@ -89,9 +100,9 @@ export function ThreadView({
             <div className="min-w-0 flex-1"></div>
             <div>
               <PromptInputSubmit
-                disabled={isLoading}
                 className="!h-8"
                 status={isLoading ? "streaming" : "ready"}
+                onClick={handleAbort}
               />
             </div>
           </PromptInputFooter>

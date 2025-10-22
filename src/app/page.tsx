@@ -14,6 +14,9 @@ export default function HomePage() {
       messages: [{ type: "human", content: message.text ?? "" }],
     });
   };
+  const handleAbort = async () => {
+    await streamedValue.stop();
+  };
   return (
     <main className="flex h-screen flex-col items-center">
       <ThreadView
@@ -21,6 +24,7 @@ export default function HomePage() {
         messages={streamedValue.messages}
         isLoading={streamedValue.isLoading}
         onSubmit={handleSubmit}
+        onAbort={handleAbort}
       />
     </main>
   );
