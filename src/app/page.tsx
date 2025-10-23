@@ -35,6 +35,7 @@ export default function HomePage() {
       <ThreadView
         className="size-full max-w-[48rem]"
         messages={streamedValue.messages}
+        todos={streamedValue.values.todos}
         isLoading={streamedValue.isLoading}
         onSubmit={handleSubmit}
         onAbort={handleAbort}

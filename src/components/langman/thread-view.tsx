@@ -17,6 +17,18 @@ import {
   PromptInputTextarea,
   type PromptInputMessage,
 } from "@/components/ai-elements/prompt-input";
+import {
+  Queue,
+  QueueSectionLabel,
+  QueueSectionTrigger,
+  QueueList,
+  QueueSectionContent,
+  QueueSection,
+  type QueueTodo,
+  QueueItem,
+  QueueItemIndicator,
+  QueueItemContent,
+} from "@/components/ai-elements/queue";
 import { Response } from "@/components/ai-elements/response";
 import {
   Tool,
@@ -34,12 +46,14 @@ type ToolCall = ArrayElement<AIMessage["tool_calls"]>;
 export function ThreadView({
   className,
   messages,
+  todos,
   isLoading,
   onSubmit,
   onAbort,
 }: {
   className?: string;
   messages: Message[];
+  todos?: QueueTodo[];
   isLoading?: boolean;
   onSubmit?: (message: PromptInputMessage) => void;
   onAbort?: () => void;
@@ -73,9 +87,38 @@ export function ThreadView({
       (message) => message.type === "human" || message.type === "ai",
     );
   }, [messages]);
+
   return (
     <div id="thread-view" className={cn("relative flex flex-col", className)}>
-      <Conversation className="h-full">
+      {todos && todos.length > 0 && (
+        <Queue>
+          <QueueSection>
+            <QueueSectionTrigger>
+              <QueueSectionLabel
+                count={todos.length}
+                label={`item${todos.length > 1 ? "s" : ""} in the to-do list`}
+              />
+            </QueueSectionTrigger>
+            <QueueSectionContent>
+              <QueueList>
+                {todos.map((todo) => (
+                  <QueueItem key={todo.id}>
+                    <div className="flex items-center gap-2">
+                      <QueueItemIndicator
+                        completed={todo.status === "completed"}
+                      />
+                      <QueueItemContent completed={todo.status === "completed"}>
+                        {todo.title}
+                      </QueueItemContent>
+                    </div>
+                  </QueueItem>
+                ))}
+              </QueueList>
+            </QueueSectionContent>
+          </QueueSection>
+        </Queue>
+      )}
+      <Conversation className="min-h-0 flex-1">
         <ConversationContent className="px-6 pb-[12rem]">
           {visibleMessages.map((message) => [
             hasContent(message) && (
