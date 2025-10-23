@@ -37,6 +37,11 @@ import {
   QueueItemIndicator,
   QueueItemContent,
 } from "@/components/ai-elements/queue";
+import {
+  Reasoning,
+  ReasoningContent,
+  ReasoningTrigger,
+} from "@/components/ai-elements/reasoning";
 import { Response } from "@/components/ai-elements/response";
 import {
   Tool,
@@ -140,6 +145,25 @@ export function ThreadView({
                 key={message.id}
                 from={message.type === "human" ? "user" : "assistant"}
               >
+                {message.type === "ai" &&
+                  message.additional_kwargs !== undefined &&
+                  typeof message.additional_kwargs.reasoning_content ===
+                    "string" &&
+                  message.additional_kwargs.reasoning_content.length > 0 && (
+                    <Reasoning
+                      className="w-full"
+                      isStreaming={
+                        (!message.content || message.content === "") &&
+                        (!message.tool_calls ||
+                          message.tool_calls?.length === 0)
+                      }
+                    >
+                      <ReasoningTrigger />
+                      <ReasoningContent>
+                        {message.additional_kwargs.reasoning_content}
+                      </ReasoningContent>
+                    </Reasoning>
+                  )}
                 {hasImages(message) && (
                   <MessageContent variant="flat">
                     {(message.content as MessageContentImageUrl[]).map(
@@ -236,6 +260,9 @@ export function ThreadView({
 
 function hasContent(message: Message): boolean {
   return (
+    (message.additional_kwargs !== undefined &&
+      typeof message.additional_kwargs.reasoning_content === "string" &&
+      message.additional_kwargs.reasoning_content.length > 0) ||
     (typeof message.content === "string" && message.content.length > 0) ||
     (Array.isArray(message.content) && message.content.length > 0)
   );
