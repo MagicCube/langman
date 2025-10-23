@@ -101,7 +101,7 @@ export function ThreadView({
             <QueueSectionTrigger>
               <QueueSectionLabel
                 count={todos.length}
-                label={`item${todos.length > 1 ? "s" : ""} in the to-do list`}
+                label={`Todo Item${todos.length > 1 ? "s" : ""}`}
               />
             </QueueSectionTrigger>
             <QueueSectionContent>
