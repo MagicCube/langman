@@ -17,7 +17,6 @@ export default function HomePage() {
         : undefined,
   });
   const handleSubmit = async (message: PromptInputMessage) => {
-    console.info(message);
     await streamedValue.submit(
       {
         messages: [
