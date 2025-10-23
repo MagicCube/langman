@@ -146,7 +146,7 @@ export function ThreadView({
                         part.type === "image_url" ? (
                           <img
                             key={index}
-                            className="h-full max-h-56 w-fit w-full max-w-72 max-w-full overflow-hidden rounded-lg object-cover object-center opacity-100 transition-opacity duration-300"
+                            className="h-full max-h-42 w-fit w-full max-w-42 max-w-full overflow-hidden rounded-lg object-cover object-center opacity-100 transition-opacity duration-300"
                             alt=""
                             src={
                               typeof part.image_url === "string"
