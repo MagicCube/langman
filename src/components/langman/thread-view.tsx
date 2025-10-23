@@ -88,11 +88,16 @@ export function ThreadView({
     );
   }, [messages]);
 
+  const hasTodos = todos && todos.length > 0;
+
   return (
-    <div id="thread-view" className={cn("relative flex flex-col", className)}>
-      {todos && todos.length > 0 && (
-        <Queue>
-          <QueueSection>
+    <div
+      id="thread-view"
+      className={cn("relative flex flex-col", hasTodos && "pt-12", className)}
+    >
+      {hasTodos && (
+        <Queue className="bg-card absolute top-2 right-0 left-0 z-20">
+          <QueueSection defaultOpen={false}>
             <QueueSectionTrigger>
               <QueueSectionLabel
                 count={todos.length}
