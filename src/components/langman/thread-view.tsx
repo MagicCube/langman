@@ -92,7 +92,7 @@ export function ThreadView({
         >
           <PromptInputBody>
             <PromptInputTextarea
-              className="min-h-0 pb-0 transition-all duration-300 focus-within:min-h-16 focus-within:pb-3"
+              className="transition-all duration-300"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
             />
