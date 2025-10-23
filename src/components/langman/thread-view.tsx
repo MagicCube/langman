@@ -9,19 +9,23 @@ import {
   Conversation,
   ConversationContent,
 } from "@/components/ai-elements/conversation";
-import { Image } from "@/components/ai-elements/image";
 import {
   Message as MessageView,
   MessageContent,
 } from "@/components/ai-elements/message";
 import {
   PromptInput,
+  PromptInputActionAddAttachments,
+  PromptInputActionMenu,
+  PromptInputActionMenuContent,
+  PromptInputActionMenuTrigger,
   PromptInputAttachment,
   PromptInputAttachments,
   PromptInputBody,
   PromptInputFooter,
   PromptInputSubmit,
   PromptInputTextarea,
+  PromptInputTools,
   type PromptInputMessage,
 } from "@/components/ai-elements/prompt-input";
 import {
@@ -192,6 +196,7 @@ export function ThreadView({
           className="bg-card/80 focus-within:bg-card/95 rounded-3xl backdrop-blur-sm transition-colors duration-500 [&>[data-slot='input-group']]:rounded-3xl [&>[data-slot='input-group']]:p-2"
           multiple
           globalDrop
+          accept="image/*"
           onSubmit={handleSubmit}
         >
           <PromptInputBody>
@@ -206,7 +211,16 @@ export function ThreadView({
             />
           </PromptInputBody>
           <PromptInputFooter className="flex">
-            <div className="min-w-0 flex-1"></div>
+            <div className="min-w-0 flex-1">
+              <PromptInputTools>
+                <PromptInputActionMenu>
+                  <PromptInputActionMenuTrigger />
+                  <PromptInputActionMenuContent>
+                    <PromptInputActionAddAttachments label="Add images" />
+                  </PromptInputActionMenuContent>
+                </PromptInputActionMenu>
+              </PromptInputTools>
+            </div>
             <div>
               <PromptInputSubmit
                 className="!h-8"
