@@ -78,28 +78,30 @@ export function ThreadView({
       <Conversation className="h-full">
         <ConversationContent className="px-6 pb-[12rem]">
           {visibleMessages.map((message) => [
-            <MessageView
-              key={message.id}
-              from={message.type === "human" ? "user" : "assistant"}
-            >
-              <MessageContent
-                variant={message.type === "human" ? "contained" : "flat"}
+            hasContent(message) && (
+              <MessageView
+                key={message.id}
+                from={message.type === "human" ? "user" : "assistant"}
               >
-                <Response rehypePlugins={[rehypeSplitWordsIntoSpans]}>
-                  {typeof message.content === "string"
-                    ? message.content
-                    : message.content
-                        .map((part) =>
-                          part.type === "text"
-                            ? part.text
-                            : typeof part.image_url === "string"
-                              ? part.image_url
-                              : part.image_url.url,
-                        )
-                        .join("\n")}
-                </Response>
-              </MessageContent>
-            </MessageView>,
+                <MessageContent
+                  variant={message.type === "human" ? "contained" : "flat"}
+                >
+                  <Response rehypePlugins={[rehypeSplitWordsIntoSpans]}>
+                    {typeof message.content === "string"
+                      ? message.content
+                      : message.content
+                          .map((part) =>
+                            part.type === "text"
+                              ? part.text
+                              : typeof part.image_url === "string"
+                                ? part.image_url
+                                : part.image_url.url,
+                          )
+                          .join("\n")}
+                  </Response>
+                </MessageContent>
+              </MessageView>
+            ),
 
             ...(message.type === "ai" && message.tool_calls
               ? message.tool_calls.map((toolCall) => (
@@ -143,6 +145,13 @@ export function ThreadView({
         </PromptInput>
       </div>
     </div>
+  );
+}
+
+function hasContent(message: Message): boolean {
+  return (
+    (typeof message.content === "string" && message.content.length > 0) ||
+    (Array.isArray(message.content) && message.content.length > 0)
   );
 }
 

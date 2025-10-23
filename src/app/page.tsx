@@ -15,13 +15,21 @@ export default function HomePage() {
         : undefined,
   });
   const handleSubmit = async (message: PromptInputMessage) => {
-    await streamedValue.submit({
-      messages: [{ type: "human", content: message.text ?? "" }],
-    });
+    await streamedValue.submit(
+      {
+        messages: [{ type: "human", content: message.text ?? "" }],
+      },
+      {
+        config: {
+          recursion_limit: 100,
+        },
+      },
+    );
   };
   const handleAbort = async () => {
     await streamedValue.stop();
   };
+  console.info(streamedValue.values);
   return (
     <main className="flex h-screen flex-col items-center">
       <ThreadView
