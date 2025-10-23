@@ -101,6 +101,9 @@ importers:
       refractor:
         specifier: ^5.0.0
         version: 5.0.0
+      shiki:
+        specifier: ^3.13.0
+        version: 3.13.0
       streamdown:
         specifier: ^1.4.0
         version: 1.4.0(@types/react@19.2.2)(react@19.2.0)
