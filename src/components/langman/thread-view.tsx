@@ -1,5 +1,5 @@
-import type { Message } from "@langchain/langgraph-sdk";
-import { useState } from "react";
+import type { AIMessage, Message, ToolMessage } from "@langchain/langgraph-sdk";
+import { useMemo, useState } from "react";
 
 import {
   Conversation,
@@ -18,8 +18,18 @@ import {
   type PromptInputMessage,
 } from "@/components/ai-elements/prompt-input";
 import { Response } from "@/components/ai-elements/response";
+import {
+  Tool,
+  ToolContent,
+  ToolHeader,
+  ToolInput,
+  ToolOutput,
+} from "@/components/ai-elements/tool";
 import { rehypeSplitWordsIntoSpans } from "@/core/rehype";
 import { cn } from "@/lib/utils";
+
+type ArrayElement<T> = T extends (infer U)[] ? U : never;
+type ToolCall = ArrayElement<AIMessage["tool_calls"]>;
 
 export function ThreadView({
   className,
@@ -49,11 +59,25 @@ export function ThreadView({
     if (!isLoading) return;
     onAbort?.();
   };
+  const toolMessages = useMemo(() => {
+    const map = new Map<string, Message>();
+    for (const message of messages) {
+      if (message.type === "tool") {
+        map.set(message.tool_call_id, message);
+      }
+    }
+    return map;
+  }, [messages]);
+  const visibleMessages = useMemo(() => {
+    return messages.filter(
+      (message) => message.type === "human" || message.type === "ai",
+    );
+  }, [messages]);
   return (
     <div id="thread-view" className={cn("relative flex flex-col", className)}>
       <Conversation className="h-full">
-        <ConversationContent className="pb-[12rem]">
-          {messages.map((message) => (
+        <ConversationContent className="px-6 pb-[12rem]">
+          {visibleMessages.map((message) => [
             <MessageView
               key={message.id}
               from={message.type === "human" ? "user" : "assistant"}
@@ -74,18 +98,26 @@ export function ThreadView({
                         )
                         .join("\n")}
                 </Response>
-                {message.type === "ai" &&
-                  message.tool_calls?.map((tool_call) => (
-                    <p key={tool_call.id}>Calling tool: {tool_call.name}</p>
-                  ))}
               </MessageContent>
-            </MessageView>
-          ))}
+            </MessageView>,
+
+            ...(message.type === "ai" && message.tool_calls
+              ? message.tool_calls.map((toolCall) => (
+                  <ToolCallView
+                    key={toolCall.id}
+                    toolCall={toolCall}
+                    toolMessage={
+                      toolMessages.get(toolCall.id!) as ToolMessage | undefined
+                    }
+                  />
+                ))
+              : []),
+          ])}
         </ConversationContent>
       </Conversation>
       <div className="absolute bottom-0 z-20 flex w-full flex-col p-4">
         <PromptInput
-          className="bg-card/75 focus-within:bg-card/95 rounded-3xl backdrop-blur-xs transition-colors duration-500 [&>[data-slot='input-group']]:rounded-3xl [&>[data-slot='input-group']]:p-2"
+          className="bg-card/80 focus-within:bg-card/95 rounded-3xl backdrop-blur-sm transition-colors duration-500 [&>[data-slot='input-group']]:rounded-3xl [&>[data-slot='input-group']]:p-2"
           multiple
           globalDrop
           onSubmit={handleSubmit}
@@ -111,5 +143,52 @@ export function ThreadView({
         </PromptInput>
       </div>
     </div>
+  );
+}
+
+export function ToolCallView({
+  toolCall,
+  toolMessage,
+}: {
+  toolCall: ToolCall;
+  toolMessage: ToolMessage | undefined;
+}) {
+  const state = useMemo(() => {
+    if (!toolCall.args) {
+      return "input-streaming";
+    }
+    if (toolMessage?.content !== undefined) {
+      if (
+        typeof toolMessage.content === "string" &&
+        toolMessage.content.startsWith("Error:")
+      ) {
+        return "output-error";
+      }
+      return "output-available";
+    }
+    return "input-available";
+  }, [toolCall.args, toolMessage]);
+  return (
+    <MessageView from="assistant">
+      <MessageContent variant="flat">
+        <Tool>
+          <ToolHeader type={`tool-${toolCall.name}`} state={state} />
+          <ToolContent>
+            <ToolInput input={toolCall.args} />
+            {toolMessage && (
+              <ToolOutput
+                output={toolMessage?.content}
+                errorText={
+                  typeof toolMessage?.content === "string" &&
+                  toolMessage.content.startsWith("Error:")
+                    ? toolMessage.content
+                    : undefined
+                }
+              />
+            )}
+          </ToolContent>
+        </Tool>
+      </MessageContent>
+    </MessageView>
   );
 }
