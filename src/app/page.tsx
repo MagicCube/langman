@@ -1,5 +1,7 @@
 "use client";
 
+import { type MessageContentImageUrl } from "@langchain/core/messages";
+
 import type { PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import { ThreadView } from "@/components/langman/thread-view";
 import { useTypedStream } from "@/core/messaging";
@@ -15,9 +17,26 @@ export default function HomePage() {
         : undefined,
   });
   const handleSubmit = async (message: PromptInputMessage) => {
+    console.info(message);
     await streamedValue.submit(
       {
-        messages: [{ type: "human", content: message.text ?? "" }],
+        messages: [
+          {
+            type: "human",
+            content: [
+              ...(message.files ?? [])
+                .filter((file) => file.mediaType?.startsWith("image/"))
+                .map(
+                  (file) =>
+                    ({
+                      type: "image_url",
+                      image_url: file.url,
+                    }) as MessageContentImageUrl,
+                ),
+              { type: "text", text: message.text ?? "" },
+            ],
+          },
+        ],
       },
       {
         config: {

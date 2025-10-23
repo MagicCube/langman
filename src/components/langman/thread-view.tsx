@@ -1,3 +1,7 @@
+import type {
+  MessageContentComplex,
+  MessageContentImageUrl,
+} from "@langchain/core/messages";
 import type { AIMessage, Message, ToolMessage } from "@langchain/langgraph-sdk";
 import { useMemo, useState } from "react";
 
@@ -5,12 +9,15 @@ import {
   Conversation,
   ConversationContent,
 } from "@/components/ai-elements/conversation";
+import { Image } from "@/components/ai-elements/image";
 import {
   Message as MessageView,
   MessageContent,
 } from "@/components/ai-elements/message";
 import {
   PromptInput,
+  PromptInputAttachment,
+  PromptInputAttachments,
   PromptInputBody,
   PromptInputFooter,
   PromptInputSubmit,
@@ -128,9 +135,28 @@ export function ThreadView({
           {visibleMessages.map((message) => [
             hasContent(message) && (
               <MessageView
+                className="flex flex-col gap-2"
                 key={message.id}
                 from={message.type === "human" ? "user" : "assistant"}
               >
+                <MessageContent variant="flat">
+                  {hasImages(message) &&
+                    (message.content as MessageContentImageUrl[]).map(
+                      (part, index) =>
+                        part.type === "image_url" ? (
+                          <img
+                            key={index}
+                            className="h-full max-h-56 w-fit w-full max-w-72 max-w-full overflow-hidden rounded-lg object-cover object-center opacity-100 transition-opacity duration-300"
+                            alt=""
+                            src={
+                              typeof part.image_url === "string"
+                                ? part.image_url
+                                : part.image_url.url
+                            }
+                          />
+                        ) : null,
+                    )}
+                </MessageContent>
                 <MessageContent
                   variant={message.type === "human" ? "contained" : "flat"}
                 >
@@ -139,11 +165,7 @@ export function ThreadView({
                       ? message.content
                       : message.content
                           .map((part) =>
-                            part.type === "text"
-                              ? part.text
-                              : typeof part.image_url === "string"
-                                ? part.image_url
-                                : part.image_url.url,
+                            part.type === "text" ? part.text : "",
                           )
                           .join("\n")}
                   </Response>
@@ -173,6 +195,9 @@ export function ThreadView({
           onSubmit={handleSubmit}
         >
           <PromptInputBody>
+            <PromptInputAttachments>
+              {(attachment) => <PromptInputAttachment data={attachment} />}
+            </PromptInputAttachments>
             <PromptInputTextarea
               className="min-h-8 transition-all duration-300"
               rows={1}
@@ -200,6 +225,13 @@ function hasContent(message: Message): boolean {
   return (
     (typeof message.content === "string" && message.content.length > 0) ||
     (Array.isArray(message.content) && message.content.length > 0)
+  );
+}
+
+function hasImages(message: Message): boolean {
+  return (
+    Array.isArray(message.content) &&
+    message.content.some((part) => part.type === "image_url")
   );
 }
 
