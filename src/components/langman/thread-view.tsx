@@ -1,7 +1,4 @@
-import type {
-  MessageContentComplex,
-  MessageContentImageUrl,
-} from "@langchain/core/messages";
+import type { MessageContentImageUrl } from "@langchain/core/messages";
 import type { AIMessage, Message, ToolMessage } from "@langchain/langgraph-sdk";
 import { useMemo, useState } from "react";
 
@@ -143,9 +140,9 @@ export function ThreadView({
                 key={message.id}
                 from={message.type === "human" ? "user" : "assistant"}
               >
-                <MessageContent variant="flat">
-                  {hasImages(message) &&
-                    (message.content as MessageContentImageUrl[]).map(
+                {hasImages(message) && (
+                  <MessageContent variant="flat">
+                    {(message.content as MessageContentImageUrl[]).map(
                       (part, index) =>
                         part.type === "image_url" ? (
                           <img
@@ -160,8 +157,10 @@ export function ThreadView({
                           />
                         ) : null,
                     )}
-                </MessageContent>
+                  </MessageContent>
+                )}
                 <MessageContent
+                  className={message.type === "human" ? "" : "w-full"}
                   variant={message.type === "human" ? "contained" : "flat"}
                 >
                   <Response rehypePlugins={[rehypeSplitWordsIntoSpans]}>
