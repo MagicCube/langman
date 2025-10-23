@@ -1,7 +1,9 @@
 import { type Message } from "@langchain/langgraph-sdk";
 import { useStream } from "@langchain/langgraph-sdk/react";
 
-export type StateType = { messages: Message[] };
+import type { QueueTodo } from "@/components/ai-elements/queue";
+
+export type StateType = { messages: Message[]; todos?: QueueTodo[] };
 
 export const useTypedStream = useStream<
   StateType,
