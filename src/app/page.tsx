@@ -8,6 +8,11 @@ export default function HomePage() {
   const streamedValue = useTypedStream({
     apiUrl: "http://localhost:2024",
     assistantId: "coding_agent",
+    threadId:
+      typeof window !== "undefined"
+        ? (new URLSearchParams(window.location.search).get("threadId") ??
+          undefined)
+        : undefined,
   });
   const handleSubmit = async (message: PromptInputMessage) => {
     await streamedValue.submit({
